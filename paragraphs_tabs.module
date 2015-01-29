@@ -1,0 +1,46 @@
+<?php
+
+function paragraphs_tabs_field_group_build_pre_render_alter(&$element) {
+  $tab_field = 'field_tab_content';
+  //$tab_field = 'field_tab_flex';
+  $groups = &$element['group_tab_content'];
+
+  // Only run if there is a tab content field.
+  if (empty($groups['group_tab_1'][$tab_field]) === TRUE) {
+    return;
+  }
+
+  $group_fields = element_children($groups['group_tab_1'][$tab_field]);
+
+  // Set up the base group.
+  $group_base = $groups['group_tab_1'];
+  unset($group_base[$tab_field]);
+
+  foreach ($group_fields as $key) {
+    $paragraph = $groups['group_tab_1'][$tab_field][$key];
+    // Dig deeper to get the real paragraphs item.
+    $paragraph = array_shift($paragraph['entity']['paragraphs_item']);
+
+    // Duplicate an empty group.
+    $paragraph_group = $group_base;
+
+
+    // Add the paragraphs item as a field of its own.
+    $paragraph_group['field_paragraph_testing'] = $paragraph;
+
+    // This is hackish. Are we sure $key will be numeric? Track your own weight!
+    $paragraph_group['#weight'] = $key;
+
+    // If the paragraph has a tab name field, use that as the tab title.
+    if (empty($paragraph['field_tab_name']) === FALSE &&
+        empty($paragraph['field_tab_name']['#items']) === FALSE) {
+      $paragraph_group['#title'] = $paragraph['field_tab_name']['#items'][0]['value'];
+    }
+    $paragraph_group['#title'] = 'Tab #' . $key;
+
+    $groups['group_tab_paragraph_' . $key] = $paragraph_group;
+  }
+
+  // Remove the original paragraphs item
+  unset($groups['group_tab_1'][$tab_field]);
+}

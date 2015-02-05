@@ -1,0 +1,18 @@
+<?php
+
+function paragraphs_tab_install() {
+  // if the field hasn't been defined yet
+  if (field_info_field('paragraphs_tabs_name') === NULL) {
+    $field = array(
+      'field_name' => 'paragraphs_tabs_name',
+      'type' => 'text',
+      'locked' => TRUE,
+    );
+    // create field only here, instances will be created by configurator
+    field_create_field($field);
+  }
+}
+
+function paragraphs_tab_uninstall() {
+  field_delete_field('paragraphs_tabs_name');
+}

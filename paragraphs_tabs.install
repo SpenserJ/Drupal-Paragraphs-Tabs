@@ -1,6 +1,6 @@
 <?php
 
-function paragraphs_tab_install() {
+function paragraphs_tabs_install() {
   // if the field hasn't been defined yet
   if (field_info_field('paragraphs_tabs_name') === NULL) {
     $field = array(
@@ -13,6 +13,6 @@ function paragraphs_tab_install() {
   }
 }
 
-function paragraphs_tab_uninstall() {
+function paragraphs_tabs_uninstall() {
   field_delete_field('paragraphs_tabs_name');
 }

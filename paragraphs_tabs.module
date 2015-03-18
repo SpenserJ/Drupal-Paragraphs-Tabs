@@ -29,7 +29,7 @@ function paragraphs_tabs_preprocess_node(&$vars) {
       // Get the item entity.
       $paragraph = array_shift($item['entity']['paragraphs_item']);
       if (empty($paragraph['paragraphs_tabs_name']) === FALSE) {
-        // If a field is found, set the htab build flag 
+        // If a field is found, set the htab build flag
         // and keep paragraph tab field name
         $is_tabbed_paragraph = TRUE;
         $tab_paragraph_field = $child_name;
@@ -47,7 +47,7 @@ function paragraphs_tabs_preprocess_node(&$vars) {
         'format_type' => 'htabs',
         'children' => array(''),
       );
-      
+
       // add fieldgroup key
       $el['#fieldgroups']['group_tab_content'] = &$el['#groups']['group_tab_content'];
 
@@ -62,7 +62,7 @@ function paragraphs_tabs_preprocess_node(&$vars) {
         'format_type' => 'htab',
         'children' => array(''),
       );
-      
+
       // make an htab for every paragraph
       $tab_paragraphs = element_children($el[$tab_paragraph_field]);
       foreach($tab_paragraphs as $paragraph_name) {

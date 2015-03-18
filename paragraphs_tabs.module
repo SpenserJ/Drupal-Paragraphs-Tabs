@@ -84,6 +84,7 @@ function paragraphs_tabs_preprocess_node(&$vars) {
         $htab_template['children'] = array('paragraphs_tab_' . $paragraph_name);
         // add group to renderable as an object
         $el['#groups']['group_tab_item_' . $paragraph_name] = (object) $htab_template;
+        $el['#groups']['group_tab_item_' . $paragraph_name]->weight = $paragraph_name;
         // set the fieldgroup paragraph_name and group child mapping
         $el['#fieldgroups']['group_tab_item_' . $paragraph_name] = &$el['#groups']['group_tab_item_' . $paragraph_name];
         $el['#group_children']['paragraphs_tab_' . $paragraph_name] = 'group_tab_item_' . $paragraph_name;
@@ -92,6 +93,7 @@ function paragraphs_tabs_preprocess_node(&$vars) {
         // update children of htab container
         $el['#groups']['group_tab_content']->children[] = 'group_tab_item_' . $paragraph_name;
       }
+      uasort($el['#groups']['group_tab_content']->children, element_sort);
 
       // now unset the paragraphs from content
       unset($vars['content'][$tab_paragraph_field]);

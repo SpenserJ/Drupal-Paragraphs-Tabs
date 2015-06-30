@@ -39,35 +39,39 @@ function paragraphs_tabs_preprocess_node(&$vars) {
 
     if ($is_tabbed_paragraph === TRUE) {
       // make the htab container on the node
-      $el['#groups']['group_tab_content'] = (object) array(
+      // namespace the group name
+      $tab_name = 'group_tab_content_' . $child_name;
+      $el['#groups'][$tab_name] = (object) array(
         'weight' => 2,
         'label' => 'Tab',
-        'group_name' => 'group_tab_content',
+        'group_name' => $tab_name,
         'parent_name' => NULL,
         'format_type' => 'htabs',
         'children' => NULL,
       );
 
       // add fieldgroup key
-      $el['#fieldgroups']['group_tab_content'] = &$el['#groups']['group_tab_content'];
+      $el['#fieldgroups'][$tab_name] = &$el['#groups'][$tab_name];
 
       // use this template to build paragraphs as htabs
       $htab_template = array(
-        'weight' => $el['#groups']['group_tab_content']->weight,
+        'weight' => $el['#groups'][$tab_name]->weight,
         'label' => '',
         'collapsible' => FALSE,
         'collapsed' => FALSE,
         'group_name' => '',
-        'parent_name' => 'group_tab_content',
+        'parent_name' => $tab_name,
         'format_type' => 'htab',
         'children' => NULL,
       );
 
       // accordion group template
-      $el['#groups']['group_accordion_content'] = (object) array(
+      // namespace accordion groups
+      $accordion_name = 'group_accordion_content_' . $child_name;
+      $el['#groups'][$accordion_name] = (object) array(
         'weight' => 3,
         'label' => 'Accordion',
-        'group_name' => 'group_accordion_content',
+        'group_name' => $accordion_name,
         'parent_name' => NULL,
         'format_type' => 'accordion',
         'format_settings' => array(
@@ -82,15 +86,15 @@ function paragraphs_tabs_preprocess_node(&$vars) {
       );
 
       // add fieldgroup key
-      $el['#fieldgroups']['group_accordion_content'] = &$el['#groups']['group_accordion_content'];
+      $el['#fieldgroups'][$accordion_name] = &$el['#groups'][$accordion_name];
       
       // use this template to build paragraphs as accordion_items
       $accordion_template = array(
-        'weight' => $el['#groups']['group_accordion_content']->weight,
+        'weight' => $el['#groups'][$accordion_name]->weight,
         'label' => '',
         'collapsed' => TRUE,
         'group_name' => '',
-        'parent_name' => 'group_accordion_content',
+        'parent_name' => $accordion_name,
         'format_type' => 'accordion_item',
         'children' => array(''),
       );
@@ -99,6 +103,9 @@ function paragraphs_tabs_preprocess_node(&$vars) {
       $tab_paragraphs = element_children($el[$tab_paragraph_field]);
       foreach($tab_paragraphs as $paragraph_index) {
         $paragraph = $el[$tab_paragraph_field][$paragraph_index];
+
+        // now that we've finished the lookup, lets namespace the paragraph index
+        $paragraph_index = $child_name . '_' . $paragraph_index;
 
         // take the entity out
         $paragraph_entity = array_shift($paragraph['entity']['paragraphs_item']);
@@ -132,15 +139,15 @@ function paragraphs_tabs_preprocess_node(&$vars) {
         $el['#fieldgroups']['group_accordion_item_' . $paragraph_index] = &$el['#groups']['group_accordion_item_' . $paragraph_index];
         $el['#group_children']['paragraphs_tab_' . $paragraph_index] = 'group_tab_item_' . $paragraph_index;
         $el['#group_children']['paragraphs_accordion_' . $paragraph_index] = 'group_accordion_item_' . $paragraph_index;
-        $el['#group_children']['group_tab_item_' . $paragraph_index] = 'group_tab_content';
-        $el['#group_children']['group_accordion_item_' . $paragraph_index] = 'group_accordion_content';
+        $el['#group_children']['group_tab_item_' . $paragraph_index] = $tab_name;
+        $el['#group_children']['group_accordion_item_' . $paragraph_index] = $accordion_name;
 
         // update children of htab container
-        $el['#groups']['group_tab_content']->children[] = 'group_tab_item_' . $paragraph_index;
-        $el['#groups']['group_accordion_content']->children[] = 'group_accordion_item_' . $paragraph_index;
+        $el['#groups'][$tab_name]->children[] = 'group_tab_item_' . $paragraph_index;
+        $el['#groups'][$accordion_name]->children[] = 'group_accordion_item_' . $paragraph_index;
       }
-      uasort($el['#groups']['group_tab_content']->children, 'element_sort');
-      uasort($el['#groups']['group_accordion_content']->children, 'element_sort');
+      uasort($el['#groups'][$tab_name]->children, 'element_sort');
+      uasort($el['#groups'][$accordion_name]->children, 'element_sort');
 
       // now unset the paragraphs from content
       unset($vars['content'][$tab_paragraph_field]);
